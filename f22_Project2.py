@@ -206,7 +206,6 @@ def check_policy_numbers(data):
             elif re.search(regex2, policy_number):
                 pass
             else:
-                print(policy_number)
                 output.append(listing[2])
     return output
 
@@ -225,9 +224,34 @@ def extra_credit(listing_id):
     every reviewer only stayed for one day), return False, indicating the lister has
     gone over their 90 day limit, else return True, indicating the lister has
     never gone over their limit.
-    5th
     """
-    pass
+    #div, r1are2x1 dir dir-ltr
+    
+    html_file = "html_files/listing_" + listing_id + "_reviews.html"
+    with open(html_file, encoding='utf-8') as html:
+        soup = BeautifulSoup(html, 'html.parser')
+        
+        # dates = soup.find_all('li', class_ = "_1f1oir5")
+        dates = soup.find_all('div', class_ = "r1are2x1 dir dir-ltr")
+        check = {}
+        
+        regex = "[a-zA-Z]+\s(\d{4})"
+        for date in dates:
+            li = date.find_all('li', class_ = "_1f1oir5")
+            for x in li:
+                year = re.findall(regex, x.text)
+            
+                if year[0] in check:
+                    check[year[0]] += 1
+                else:
+                    check[year[0]] = 1
+       
+        return max(check.values()) <= 90
+      
+           
+            
+    
+    
 
 
 class TestCases(unittest.TestCase):
@@ -337,6 +361,14 @@ class TestCases(unittest.TestCase):
         # check that the first element in the list is '16204265'
         self.assertEqual(invalid_listings[0], '16204265')
         pass
+    
+    def test_extra_credit(self):
+        listing_id = ['1944564', '16204265']
+        licenses = [extra_credit(id) for id in listing_id]
+        
+        #I hand counted all years: need to get true for 1944564 and false for 16204265
+        self.assertTrue(licenses[0])
+        self.assertFalse(licenses[1])
 
 
 if __name__ == '__main__':
